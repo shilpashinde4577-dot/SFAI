@@ -1,0 +1,53 @@
+{% extends 'farming/base.html' %}
+
+{% block title %}Login | SmartFarm AI{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1 class="auth-title">🔐 Welcome Back</h1>
+                <p class="auth-subtitle">Log in to access your SmartFarm AI dashboard & history.</p>
+            </div>
+
+            {% if messages %}
+                <div style="margin-bottom: 1.5rem;">
+                    {% for message in messages %}
+                        <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 0.8rem 1rem; border-radius: var(--radius-sm); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            ⚠️ {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'farming:login' %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
+                
+                <div class="form-group" style="margin-bottom: 1.2rem;">
+                    <label for="username" style="display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; color: var(--clr-text);">
+                        User ID or Email
+                    </label>
+                    <input type="text" id="username" name="username" class="form-input" placeholder="Enter User ID or registered Email" required autocomplete="username" style="width: 100%;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label for="password" style="display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; color: var(--clr-text);">
+                        Password
+                    </label>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" required autocomplete="current-password" style="width: 100%;">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 1rem; font-weight: 700; border-radius: var(--radius-md);">
+                    🚀 Sign In
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                Don't have an account yet? <a href="{% url 'farming:register' %}">Create Account</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

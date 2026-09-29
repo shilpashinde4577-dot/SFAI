@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>SmartFarm AI - Assessment Report</title>
+    <style>
+        @page {
+            size: a4 portrait;
+            margin: 1.2cm;
+            @frame footer {
+                -pdf-frame-content: pageFooter;
+                bottom: 0.6cm;
+                margin-left: 1.2cm;
+                margin-right: 1.2cm;
+                height: 0.8cm;
+            }
+        }
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #1e293b;
+            font-size: 10pt;
+            line-height: 1.5;
+        }
+        .header-table {
+            width: 100%;
+            border-bottom: 2px solid #10b981;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+        .brand-title {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #065f46;
+        }
+        .doc-title {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #1e293b;
+            text-align: right;
+        }
+        .meta-table {
+            width: 100%;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 8px 12px;
+            margin-bottom: 15px;
+        }
+        .meta-label {
+            font-weight: bold;
+            color: #475569;
+            font-size: 9pt;
+        }
+        .meta-val {
+            color: #0f172a;
+            font-size: 9.5pt;
+        }
+        .section-header {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #047857;
+            border-bottom: 1.5px solid #a7f3d0;
+            padding-bottom: 4px;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            margin-bottom: 15px;
+        }
+        .data-table th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: bold;
+            text-align: left;
+            padding: 6px 10px;
+            border: 1px solid #cbd5e1;
+            font-size: 9.5pt;
+        }
+        .data-table td {
+            padding: 6px 10px;
+            border: 1px solid #cbd5e1;
+            font-size: 9.5pt;
+        }
+        .highlight-box {
+            background-color: #ecfdf5;
+            border-left: 4px solid #10b981;
+            padding: 10px 14px;
+            margin: 12px 0;
+        }
+        .result-title {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #065f46;
+        }
+        .advice-box {
+            background-color: #fffbebfb;
+            border-left: 4px solid #f59e0b;
+            padding: 10px 14px;
+            margin: 12px 0;
+            font-size: 9.5pt;
+        }
+        .stamp-box {
+            margin-top: 25px;
+            border: 1px dashed #059669;
+            padding: 8px;
+            text-align: center;
+            background-color: #f0fdf4;
+            color: #047857;
+            font-size: 8.5pt;
+            font-weight: bold;
+        }
+        .footer-text {
+            font-size: 8pt;
+            color: #94a3b8;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <table class="header-table">
+        <tr>
+            <td style="width: 50%;">
+                <div class="brand-title">SmartFarm AI</div>
+                <div style="font-size: 8.5pt; color: #64748b;">Precision Machine Learning Agricultural Advisory</div>
+            </td>
+            <td style="width: 50%; text-align: right;">
+                <div class="doc-title">{{ module_title }} Report</div>
+                <div style="font-size: 8.5pt; color: #64748b;">Ref: SF-{{ report_id }} | Date: {{ report_date }}</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Assessment Metadata -->
+    <table class="meta-table">
+        <tr>
+            <td class="meta-label" style="width: 20%;">Analysis Module:</td>
+            <td class="meta-val" style="width: 30%;">{{ module_title }}</td>
+            <td class="meta-label" style="width: 20%;">Execution Model:</td>
+            <td class="meta-val" style="width: 30%;">RandomForest / CNN ML Core</td>
+        </tr>
+        <tr>
+            <td class="meta-label">Generated On:</td>
+            <td class="meta-val">{{ report_date }}</td>
+            <td class="meta-label">Status:</td>
+            <td class="meta-val" style="color: #059669; font-weight: bold;">VERIFIED ANALYSIS</td>
+        </tr>
+    </table>
+
+    <!-- 1. Crop Recommendation Report -->
+    {% if module_code == 'crop' %}
+        <div class="section-header">1. Environmental & Soil Parameters</div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Measured Value</th>
+                    <th>Optimal Range Standard</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Temperature</td>
+                    <td><strong>{{ record.temperature }} °C</strong></td>
+                    <td>15.0 °C – 38.0 °C</td>
+                    <td><span style="color: #059669;">Optimal</span></td>
+                </tr>
+                <tr>
+                    <td>Humidity</td>
+                    <td><strong>{{ record.humidity }} %</strong></td>
+                    <td>40.0 % – 90.0 %</td>
+                    <td><span style="color: #059669;">Optimal</span></td>
+                </tr>
+                <tr>
+                    <td>Soil Moisture</td>
+                    <td><strong>{{ record.soil_moisture }} %</strong></td>
+                    <td>20.0 % – 80.0 %</td>
+                    <td><span style="color: #059669;">Optimal</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-header">2. Machine Learning Recommendation</div>
+        <div class="highlight-box">
+            <div style="font-size: 9pt; color: #047857; font-weight: bold;">RECOMMENDED CROP FOR SOWING</div>
+            <div class="result-title" style="font-size: 16pt; color: #065f46; margin-top: 4px;">{{ record.predicted_crop }}</div>
+            <div style="margin-top: 6px; font-size: 9.5pt; color: #334155;">
+                Based on multi-variable Machine Learning classification, <strong>{{ record.predicted_crop }}</strong> exhibits the highest yield suitability given your specific soil moisture ({{ record.soil_moisture }}%), temperature ({{ record.temperature }}°C), and humidity ({{ record.humidity }}%).
+            </div>
+        </div>
+
+        <div class="section-header">3. Agronomic Recommendations</div>
+        <div class="advice-box">
+            <ul>
+                <li>Ensure land preparation and seedbed tillering match local agro-climatic protocols for {{ record.predicted_crop }}.</li>
+                <li>Monitor soil moisture levels during initial seed germination phases.</li>
+                <li>Conduct regular soil testing for optimal nitrogen-phosphorus-potassium balance before fertilizer application.</li>
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- 2. Disease Detection Report -->
+    {% if module_code == 'disease' %}
+        <div class="section-header">1. Crop Leaf Inspection Data</div>
+        <table style="width: 100%; margin-bottom: 15px;">
+            <tr>
+                {% if image_path %}
+                <td style="width: 40%; vertical-align: top;">
+                    <div style="font-size: 9pt; font-weight: bold; color: #475569; margin-bottom: 6px;">Uploaded Crop Leaf Image:</div>
+                    <img src="{{ image_path }}" style="width: 220px; height: 180px; border: 2px solid #cbd5e1; border-radius: 6px;" />
+                </td>
+                {% endif %}
+                <td style="width: {% if image_path %}60%{% else %}100%{% endif %}; vertical-align: top;">
+                    <div style="font-size: 9pt; font-weight: bold; color: #475569; margin-bottom: 6px;">CNN Model Classification Result:</div>
+                    <div class="highlight-box" style="margin-top: 0;">
+                        <div style="font-size: 9pt; color: #047857; font-weight: bold;">DETECTED DIAGNOSIS</div>
+                        <div class="result-title" style="font-size: 15pt; color: #dc2626;">{{ record.detected_disease }}</div>
+                        <div style="margin-top: 4px; font-size: 9.5pt;"><strong>AI Model Confidence:</strong> {{ record.confidence|floatformat:1 }}%</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="section-header">2. Treatment & Prescription Guidelines</div>
+        <div class="advice-box">
+            <div style="font-weight: bold; color: #b45309; margin-bottom: 4px;">Prescribed Treatment:</div>
+            <div>{{ record.recommendation }}</div>
+        </div>
+    {% endif %}
+
+    <!-- 3. Fertilizer Recommendation Report -->
+    {% if module_code == 'fertilizer' %}
+        <div class="section-header">1. Soil Nutrient Profile (Per Acre)</div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Target Crop</th>
+                    <th>Nitrogen (N)</th>
+                    <th>Phosphorus (P)</th>
+                    <th>Potassium (K)</th>
+                    <th>Soil pH</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>{{ record.crop_name|title }}</strong></td>
+                    <td>{{ record.nitrogen }} kg/ha</td>
+                    <td>{{ record.phosphorus }} kg/ha</td>
+                    <td>{{ record.potassium }} kg/ha</td>
+                    <td>{{ record.soil_ph }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-header">2. Fertilizer Prescription</div>
+        <div class="highlight-box">
+            <div style="font-size: 9pt; color: #047857; font-weight: bold;">RECOMMENDED FERTILIZER FORMULATION</div>
+            <div class="result-title" style="font-size: 14pt; color: #065f46; margin-top: 4px;">{{ record.recommendation }}</div>
+        </div>
+
+        {% if recommendations %}
+        <div class="section-header">3. Detailed Dosage Schedule</div>
+        <div class="advice-box">
+            <ul>
+                {% for item in recommendations %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    {% endif %}
+
+    <!-- 4. Weather Prediction Report -->
+    {% if module_code == 'weather' %}
+        <div class="section-header">1. Meteorological Readings</div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Recorded Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Ambient Temperature</td>
+                    <td><strong>{{ record.temperature }} °C</strong></td>
+                </tr>
+                <tr>
+                    <td>Relative Humidity</td>
+                    <td><strong>{{ record.humidity }} %</strong></td>
+                </tr>
+                <tr>
+                    <td>Soil Moisture Index</td>
+                    <td><strong>{{ record.soil_moisture }} %</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-header">2. Forecast Prediction</div>
+        <div class="highlight-box">
+            <div style="font-size: 9pt; color: #047857; font-weight: bold;">EXPECTED WEATHER CONDITION</div>
+            <div class="result-title" style="font-size: 16pt; color: #0284c7; margin-top: 4px;">{{ record.predicted_weather }}</div>
+        </div>
+    {% endif %}
+
+    <!-- 5. Market Analysis Report -->
+    {% if module_code == 'market' %}
+        <div class="section-header">1. Mandi Price Assessment</div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Commodity</th>
+                    <th>State Mandi</th>
+                    <th>Current Market Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>{{ record.crop_name }}</strong></td>
+                    <td>{{ record.state }}</td>
+                    <td><strong>Rs. {{ record.current_price }} per kg</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-header">2. Market Intelligence Summary</div>
+        <div class="highlight-box">
+            <div style="font-size: 9pt; color: #047857; font-weight: bold;">PRICE FORECAST & TREND ANALYSIS</div>
+            <div style="margin-top: 6px; font-size: 10pt; color: #1e293b;">
+                Regional Mandi historical and price prediction models indicate steady market demand for <strong>{{ record.crop_name }}</strong> in <strong>{{ record.state }}</strong>. Farmers are advised to time market deliveries according to seasonal peak pricing windows.
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- 6. Crop Compensation Report -->
+    {% if module_code == 'compensation' %}
+        <div class="section-header">1. Calamity Loss Parameters</div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>State</th>
+                    <th>Affected Crop</th>
+                    <th>Damage Factor</th>
+                    <th>Land Area</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ record.state }}</td>
+                    <td>{{ record.crop_name }}</td>
+                    <td><span style="color: #dc2626; font-weight: bold;">{{ record.damage_factor }}</span></td>
+                    <td>{{ record.acreage }} Acres</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-header">2. ML Compensation Calculation</div>
+        <div class="highlight-box">
+            <table style="width: 100%;">
+                <tr>
+                    <td>
+                        <div style="font-size: 9pt; color: #047857; font-weight: bold;">COMPENSATION RATE PER ACRE</div>
+                        <div style="font-size: 14pt; font-weight: bold; color: #065f46;">Rs. {{ record.compensation_per_acre|floatformat:2 }}</div>
+                    </td>
+                    <td style="text-align: right;">
+                        <div style="font-size: 9pt; color: #047857; font-weight: bold;">ESTIMATED TOTAL COMPENSATION</div>
+                        <div style="font-size: 16pt; font-weight: bold; color: #059669;">Rs. {{ record.total_compensation|floatformat:2 }}</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    {% endif %}
+
+    <!-- 7. Benefit Eligibility Report -->
+    {% if module_code == 'eligibility' %}
+        <div class="section-header">1. Farmer & Crop Loss Details</div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Reported Data</th>
+                    <th>Govt Benchmark Criteria</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>State & Crop</td>
+                    <td>{{ record.state }} – {{ record.crop_name }}</td>
+                    <td>Registered State Mandi Jurisdiction</td>
+                </tr>
+                <tr>
+                    <td>Damage Cause</td>
+                    <td>{{ record.damage_factor }}</td>
+                    <td>PMFBY / SDRF Notified Disaster</td>
+                </tr>
+                <tr>
+                    <td>Recorded Loss (%)</td>
+                    <td><strong>{{ record.loss_percentage }}%</strong></td>
+                    <td>Minimum 33% Threshold Required</td>
+                </tr>
+                <tr>
+                    <td>Intimation Time</td>
+                    <td><strong>{{ record.intimation_hours }} Hours</strong></td>
+                    <td>Within 72 Hours Mandatory</td>
+                </tr>
+                <tr>
+                    <td>PMFBY Insurance Status</td>
+                    <td>{{ record.insured_status }}</td>
+                    <td>Insurance / Calamity Relief Fund</td>
+                </tr>
+                <tr>
+                    <td>Farmer Category</td>
+                    <td>{{ record.farmer_category }}</td>
+                    <td>Small / Marginal / General Farmer</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-header">2. Government Scheme Eligibility Finding</div>
+        <div class="highlight-box" style="{% if record.is_eligible %}background-color: #ecfdf5; border-left: 4px solid #10b981;{% else %}background-color: #fef2f2; border-left: 4px solid #ef4444;{% endif %}">
+            <table style="width: 100%;">
+                <tr>
+                    <td>
+                        <div style="font-size: 9pt; font-weight: bold; color: #475569;">EVALUATION STATUS</div>
+                        <div style="font-size: 15pt; font-weight: bold; {% if record.is_eligible %}color: #059669;{% else %}color: #dc2626;{% endif %}">
+                            {% if record.is_eligible %}ELIGIBLE FOR GOVERNMENT BENEFIT RELIEF{% else %}NOT ELIGIBLE FOR DIRECT COMPENSATION{% endif %}
+                        </div>
+                    </td>
+                    <td style="text-align: right;">
+                        <div style="font-size: 9pt; font-weight: bold; color: #475569;">ML CONFIDENCE SCORE</div>
+                        <div style="font-size: 14pt; font-weight: bold; color: #0284c7;">{{ record.confidence|floatformat:1 }}%</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    {% endif %}
+
+    <!-- Verification Stamp -->
+    <div class="stamp-box">
+        OFFICIAL SMARTFARM AI AGRICULTURAL ADVISORY REPORT &bull; AUTOMATED ML EVALUATION &bull; NO PHYSICAL SIGNATURE REQUIRED
+    </div>
+
+    <!-- Footer Element -->
+    <div id="pageFooter">
+        <table style="width: 100%; border-top: 1px solid #cbd5e1; padding-top: 4px;">
+            <tr>
+                <td style="font-size: 8pt; color: #94a3b8;">SmartFarm AI System &copy; 2025 | Confidential Agricultural Report</td>
+                <td style="font-size: 8pt; color: #94a3b8; text-align: right;">Page <pdf:pagenumber/> of <pdf:pagecount/></td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+</html>

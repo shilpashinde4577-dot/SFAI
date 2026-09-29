@@ -1,0 +1,19 @@
+# SmartFarmAI Requirements - Simplified Version
+# Let pip resolve the best versions for your Python environment
+
+django
+djangorestframework
+django-cors-headers
+scikit-learn
+numpy
+pandas
+joblib
+pillow
+yfinance
+requests
+python-dateutil
+scipy
+
+# NOTE: tensorflow is currently not supported on Python 3.14. 
+# If using Python 3.10-3.12, you can manually install it:
+# pip install tensorflow

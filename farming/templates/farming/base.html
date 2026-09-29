@@ -1,0 +1,492 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Smart Farming using Machine Learning - Crop recommendation, disease detection, and fertilizer guidance.">
+    <title>{% block title %}Smart Farming{% endblock %} | ML-Powered Agriculture</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'farming/css/style.css' %}?v=2.2">
+    <style>
+        /* Complete destruction of Google Translate top banner frame & popups */
+        .goog-te-banner-frame,
+        iframe.goog-te-banner-frame,
+        .goog-te-banner-frame.skiptranslate,
+        iframe[id^=":1"],
+        iframe[id^=":2"],
+        #goog-gt-tt,
+        .goog-te-balloon-frame,
+        .goog-te-spinner-pos,
+        .VIpgJd-yDtfNd-OJuWvd,
+        .VIpgJd-yDtfNd-OJuWvd-b2j2fe {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            height: 0px !important;
+            width: 0px !important;
+            position: absolute !important;
+            top: -9999px !important;
+            left: -9999px !important;
+            pointer-events: none !important;
+        }
+
+        html,
+        body {
+            top: 0px !important;
+            position: static !important;
+            margin-top: 0px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="main-nav">
+        <div class="nav-container">
+            <a href="{% url 'farming:index' %}" class="nav-logo">
+                <span class="logo-icon">🌾</span>
+                <span class="logo-text">SmartFarm<span class="logo-accent">AI</span></span>
+            </a>
+
+            <ul class="nav-links" id="nav-links">
+                <li><a href="{% url 'farming:index' %}" class="nav-link" data-i18n="nav_home">Home</a></li>
+
+                {% if request.user.is_authenticated %}
+                <li><a href="{% url 'farming:crop_recommendation' %}" class="nav-link" data-i18n="nav_crops">Crops</a>
+                </li>
+                <li><a href="{% url 'farming:disease_detection' %}" class="nav-link" data-i18n="nav_disease">Disease</a>
+                </li>
+                <li><a href="{% url 'farming:fertilizer_recommendation' %}" class="nav-link"
+                        data-i18n="nav_fertilizer">Fertilizer</a></li>
+                <li><a href="{% url 'farming:weather_prediction' %}" class="nav-link"
+                        data-i18n="nav_weather">Weather</a></li>
+                <li><a href="{% url 'farming:market_analysis' %}" class="nav-link" data-i18n="nav_market">Market</a>
+                </li>
+                <li><a href="{% url 'farming:crop_compensation' %}" class="nav-link"
+                        data-i18n="nav_compensation">Compensation</a></li>
+                <li><a href="{% url 'farming:benefit_eligibility' %}" class="nav-link"
+                        data-i18n="nav_govt_benefits">Govt Benefits</a></li>
+                <li><a href="{% url 'farming:combined_report' %}" class="nav-link nav-dashboard-link">Dashboard</a></li>
+                {% if request.user.profile.is_admin %}
+                <li><a href="{% url 'farming:admin_dashboard' %}" class="nav-link nav-admin-link">🛡️ Admin</a></li>
+                {% endif %}
+                {% endif %}
+
+                <li><a href="{% url 'farming:help' %}" class="nav-link" data-i18n="nav_help">Help</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <div class="nav-lang-item notranslate" translate="no">
+                    <div class="lang-select-wrapper notranslate" translate="no">
+                        <span style="font-size: 0.9rem;" class="notranslate" translate="no">🌐</span>
+                        <select id="language-select" aria-label="Select Language" class="notranslate" translate="no">
+                            <option value="en" class="notranslate" translate="no">English</option>
+                            <option value="kn" class="notranslate" translate="no">ಕನ್ನಡ (Kannada)</option>
+                            <option value="hi" class="notranslate" translate="no">हिंदी (Hindi)</option>
+                            <option value="mr" class="notranslate" translate="no">ಮರಾಠಿ (Marathi)</option>
+                            <option value="te" class="notranslate" translate="no">తెలుగు (Telugu)</option>
+                            <option value="ta" class="notranslate" translate="no">தமிழ் (Tamil)</option>
+                        </select>
+                    </div>
+                </div>
+
+                {% if request.user.is_authenticated %}
+                <div class="nav-user-dropdown" id="user-dropdown-li">
+                    <div class="user-menu-btn" id="user-menu-btn" role="button" aria-haspopup="true"
+                        aria-expanded="false" tabindex="0">
+                        {% if request.user.profile.profile_picture and request.user.profile.profile_picture.name %}
+                        <img src="{{ request.user.profile.profile_picture.url }}" alt="{{ request.user.username }}"
+                            class="avatar-img"
+                            onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                        <div class="avatar-placeholder" style="display:none;">{{ request.user.username|slice:":1"|upper
+                            }}</div>
+                        {% else %}
+                        <div class="avatar-placeholder">{{ request.user.username|slice:":1"|upper }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="dropdown-menu" id="user-dropdown-menu" role="menu">
+                        <a href="{% url 'farming:profile' %}" class="dropdown-item" role="menuitem">
+                            👤 My Profile (@{{ request.user.username }})
+                        </a>
+                        {% if request.user.profile.is_admin %}
+                        <a href="{% url 'farming:admin_dashboard' %}" class="dropdown-item" style="color: #a78bfa;"
+                            role="menuitem">
+                            🛡️ Admin Control Panel
+                        </a>
+                        {% endif %}
+                        <div class="dropdown-divider"></div>
+                        <a href="{% url 'farming:logout' %}" class="dropdown-item logout-item" role="menuitem">
+                            🚪 Log Out
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="nav-auth-btns">
+                    <a href="{% url 'farming:login' %}" class="nav-link nav-login-btn">Log In</a>
+                    <a href="{% url 'farming:register' %}" class="nav-link nav-register-btn">Register</a>
+                </div>
+                {% endif %}
+
+
+            </div>
+    
+</nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Floating AI Chatbot Widget -->
+    <div id="chatbot-container">
+        <!-- Floating Trigger Button -->
+        <button id="chatbot-toggle" aria-label="Open AI Assistant">
+            <span style="font-size: 1.3rem;">🤖</span>
+            <span class="chatbot-btn-text">Ask AI</span>
+            <span id="chatbot-badge">1</span>
+        </button>
+
+        <!-- Chat Window Popup -->
+        <div id="chatbot-window" style="display: none;">
+            <!-- Header -->
+            <div class="chatbot-header">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <span style="font-size: 1.4rem;">🤖</span>
+                    <div>
+                        <strong style="display: block; font-size: 0.95rem; color: #fff; font-weight: 700;">SmartFarm
+                            Assistant</strong>
+                        <span style="font-size: 0.75rem; color: #10b981;">● Online (AI Guide)</span>
+                    </div>
+                </div>
+                <button id="chatbot-close" aria-label="Close Chat">&times;</button>
+            </div>
+
+            <!-- Messages Stream -->
+            <div id="chatbot-messages"></div>
+
+            <!-- Input Bar -->
+            <div class="chatbot-input-bar">
+                <input type="text" id="chatbot-input" placeholder="Ask a question or request a walkthrough..."
+                    autocomplete="off">
+                <button id="chatbot-send" aria-label="Send Message">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Chatbot Container Styles */
+        #chatbot-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 99999;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #chatbot-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--clr-primary, #10b981), var(--clr-accent, #06b6d4));
+            color: #fff;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        #chatbot-toggle:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.6);
+        }
+
+        #chatbot-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 800;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #111827;
+        }
+
+        #chatbot-window {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            width: 380px;
+            max-width: 90vw;
+            height: 500px;
+            max-height: 80vh;
+            background: rgba(17, 24, 39, 0.96);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: chatbotPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes chatbotPop {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .chatbot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.15));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.9rem 1.2rem;
+        }
+
+        #chatbot-close {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        #chatbot-close:hover {
+            color: #fff;
+        }
+
+        #chatbot-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .chat-msg {
+            display: flex;
+            gap: 0.6rem;
+            align-items: flex-start;
+            max-width: 88%;
+        }
+
+        .chat-msg.bot-msg {
+            align-self: flex-start;
+        }
+
+        .chat-msg.user-msg {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .bot-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--clr-primary, #10b981);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .msg-bubble {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.88rem;
+            color: #e2e8f0;
+            line-height: 1.45;
+        }
+
+        .user-msg .msg-bubble {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border: none;
+            border-bottom-right-radius: 2px;
+        }
+
+        .bot-msg .msg-bubble {
+            border-bottom-left-radius: 2px;
+        }
+
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.8rem;
+        }
+
+        .chat-chip {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chat-chip:hover {
+            background: #10b981;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .chat-link {
+            color: #38bdf8;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        .chatbot-input-bar {
+            display: flex;
+            padding: 0.8rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(11, 15, 25, 0.8);
+            gap: 0.5rem;
+        }
+
+        #chatbot-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 30px;
+            padding: 0.5rem 1rem;
+            color: #fff;
+            font-size: 0.85rem;
+            outline: none;
+        }
+
+        #chatbot-input:focus {
+            border-color: #10b981;
+        }
+
+        #chatbot-send {
+            background: #10b981;
+            color: #fff;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        #chatbot-send:hover {
+            transform: scale(1.1);
+        }
+    </style>
+
+    <!-- Hidden Google Translate element bridge -->
+    <div id="google_translate_element" style="display:none;"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p>&copy; 2026 SmartFarm<span class="logo-accent">AI</span> — <span data-i18n="footer_rights">ML-Powered
+                    Agriculture for Farmers</span></p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{% static 'farming/js/i18n.js' %}"></script>
+    <script src="{% static 'farming/js/chatbot.js' %}"></script>
+    <script>
+        window.USER_AUTHENTICATED = {{ request.user.is_authenticated|yesno:"true,false" }};
+    </script>
+    <script type="text/javascript"
+        src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script>
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                autoDisplay: false,
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            }, 'google_translate_element');
+        }
+
+        // Mobile nav toggle (hamburger)
+        const navToggle = document.getElementById('nav-toggle');
+        const navLinks = document.getElementById('nav-links');
+        if (navToggle && navLinks) {
+            navToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                navToggle.classList.toggle('active');
+            });
+        }
+
+        // User dropdown – click-to-toggle (works on touch/mobile too)
+        const userMenuBtn = document.getElementById('user-menu-btn');
+        const userDropdownMenu = document.getElementById('user-dropdown-menu');
+        if (userMenuBtn && userDropdownMenu) {
+            userMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = userDropdownMenu.classList.contains('open');
+                userDropdownMenu.classList.toggle('open', !isOpen);
+                userMenuBtn.setAttribute('aria-expanded', String(!isOpen));
+            });
+            userMenuBtn.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    userMenuBtn.click();
+                }
+            });
+            // Close when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!userMenuBtn.contains(e.target) && !userDropdownMenu.contains(e.target)) {
+                    userDropdownMenu.classList.remove('open');
+                    userMenuBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('main-nav');
+            if (window.scrollY > 30) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

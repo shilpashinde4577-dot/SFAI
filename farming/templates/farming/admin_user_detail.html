@@ -1,0 +1,156 @@
+{% extends 'farming/base.html' %}
+
+{% block title %}User Inspection: {{ target_user.username }} | Admin Panel{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="section-container" style="max-width: 1150px;">
+        
+        <div style="margin-bottom: 1.5rem;">
+            <a href="{% url 'farming:admin_dashboard' %}" class="btn" style="background: var(--clr-surface-2); color: var(--clr-text-muted); padding: 0.5rem 1rem; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                ⬅️ Back to Admin User List
+            </a>
+        </div>
+
+        <!-- Header Card -->
+        <div class="result-card" style="margin-bottom: 2rem; padding: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 1.5rem;">
+                    {% if user_profile.profile_picture and user_profile.profile_picture.name %}
+                        <img src="{{ user_profile.profile_picture.url }}" alt="{{ target_user.username }}" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 3px solid var(--clr-primary);" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                        <div style="display:none; width: 72px; height: 72px; border-radius: 50%; background: var(--clr-surface-2); border: 2px solid var(--clr-border); align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; color: var(--clr-primary);">
+                            {{ target_user.username|slice:":1"|upper }}
+                        </div>
+                    {% else %}
+                        <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--clr-surface-2); border: 2px solid var(--clr-border); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; color: var(--clr-primary);">
+                            {{ target_user.username|slice:":1"|upper }}
+                        </div>
+                    {% endif %}
+
+                    <div>
+                        <h1 style="font-size: 1.8rem; font-weight: 800; color: var(--clr-text); margin-bottom: 0.3rem;">
+                            {{ target_user.get_full_name|default:target_user.username }}
+                        </h1>
+                        <p style="color: var(--clr-text-muted); font-size: 0.95rem;">
+                            User ID: <strong style="color: var(--clr-primary);">@{{ target_user.username }}</strong> | Email: {{ target_user.email }}
+                        </p>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.6rem;">
+                            <span class="badge badge-{{ user_profile.role }}">{{ user_profile.role|upper }}</span>
+                            <span class="badge badge-{{ user_profile.status }}">{{ user_profile.status|upper }}</span>
+                            <span style="font-size: 0.8rem; color: var(--clr-text-muted); margin-left: 0.5rem; align-self: center;">Joined: {{ target_user.date_joined|date:"F j, Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {% if target_user != request.user %}
+                    <div style="display: flex; gap: 0.8rem;">
+                        <form method="POST" action="{% url 'farming:admin_toggle_user_status' target_user.id %}">
+                            {% csrf_token %}
+                            {% if user_profile.status == 'active' %}
+                                <button type="submit" class="btn" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; font-weight: 700;">
+                                    🚫 Ban User Account
+                                </button>
+                            {% else %}
+                                <button type="submit" class="btn" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; font-weight: 700;">
+                                    ✅ Activate User Account
+                                </button>
+                            {% endif %}
+                        </form>
+
+                        <form method="POST" action="{% url 'farming:admin_toggle_user_role' target_user.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn" style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); color: #a78bfa; font-weight: 700;">
+                                👑 Switch Role (Current: {{ user_profile.role|upper }})
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="two-col-layout">
+            
+            <!-- Target User Prediction Records -->
+            <div class="result-card" style="margin: 0; padding: 1.5rem;">
+                <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--clr-text); margin-bottom: 1rem; border-bottom: 1px solid var(--clr-border); padding-bottom: 0.6rem;">
+                    🌱 AI Diagnostics & Query History
+                </h2>
+
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    
+                    <div>
+                        <strong style="color: var(--clr-primary); font-size: 0.9rem;">Crop Recommendations (Recent):</strong>
+                        {% if user_predictions.crops %}
+                            <ul style="list-style: none; font-size: 0.85rem; color: var(--clr-text-muted); margin-top: 0.3rem;">
+                                {% for c in user_predictions.crops %}
+                                    <li style="padding: 0.3rem 0; border-bottom: 1px solid var(--clr-border);">
+                                        Predicted: <strong style="color: var(--clr-text);">{{ c.predicted_crop }}</strong> (Temp: {{ c.temperature }}°C, Hum: {{ c.humidity }}%) — {{ c.created_at|date:"M d, Y" }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p style="font-size: 0.82rem; color: var(--clr-text-muted);">No crop recommendations run.</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <strong style="color: var(--clr-primary); font-size: 0.9rem;">Disease Detections (Recent):</strong>
+                        {% if user_predictions.diseases %}
+                            <ul style="list-style: none; font-size: 0.85rem; color: var(--clr-text-muted); margin-top: 0.3rem;">
+                                {% for d in user_predictions.diseases %}
+                                    <li style="padding: 0.3rem 0; border-bottom: 1px solid var(--clr-border);">
+                                        Detected: <strong style="color: var(--clr-text);">{{ d.detected_disease }}</strong> (Confidence: {{ d.confidence }}%) — {{ d.created_at|date:"M d, Y" }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p style="font-size: 0.82rem; color: var(--clr-text-muted);">No disease detections run.</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <strong style="color: var(--clr-primary); font-size: 0.9rem;">Compensation & Scheme Calculations:</strong>
+                        {% if user_predictions.compensations or user_predictions.eligibilities %}
+                            <ul style="list-style: none; font-size: 0.85rem; color: var(--clr-text-muted); margin-top: 0.3rem;">
+                                {% for comp in user_predictions.compensations %}
+                                    <li style="padding: 0.3rem 0; border-bottom: 1px solid var(--clr-border);">
+                                        Claim: <strong style="color: var(--clr-text);">₹{{ comp.total_compensation|floatformat:0 }}</strong> for {{ comp.crop_name }} ({{ comp.damage_factor }})
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p style="font-size: 0.82rem; color: var(--clr-text-muted);">No compensation claims calculated.</p>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Target User Complete Activity Log -->
+            <div class="result-card" style="margin: 0; padding: 1.5rem;">
+                <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--clr-text); margin-bottom: 1rem; border-bottom: 1px solid var(--clr-border); padding-bottom: 0.6rem;">
+                    📜 Chronological Activity Audit Log
+                </h2>
+
+                {% if user_logs %}
+                    <div class="activity-list" style="max-height: 480px; overflow-y: auto;">
+                        {% for log in user_logs %}
+                            <div class="activity-item">
+                                <div class="activity-info">
+                                    <div class="activity-title">{{ log.action }}</div>
+                                    <div class="activity-details">{{ log.details|default:"No details" }} — IP: {{ log.ip_address|default:"Local" }}</div>
+                                </div>
+                                <div class="activity-time">{{ log.timestamp|date:"M d, H:i" }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: var(--clr-text-muted); font-size: 0.85rem;">No activity log recorded for this user.</p>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+</section>
+{% endblock %}

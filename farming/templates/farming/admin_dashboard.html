@@ -1,0 +1,231 @@
+{% extends 'farming/base.html' %}
+
+{% block title %}Admin Dashboard | SmartFarm AI Control Panel{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="section-container" style="max-width: 1300px;">
+
+        <!-- Header -->
+        <div class="page-header"
+            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+            <div>
+                <h1 class="page-title">🛡️ Admin Dashboard <span class="logo-accent">&</span> User Management</h1>
+                <p class="page-subtitle">Oversee registered farmers, monitor real-time AI usage, and manage user
+                    permissions.</p>
+            </div>
+            <a href="{% url 'farming:combined_report' %}" class="btn btn-primary"
+                style="font-size: 0.95rem; padding: 0.7rem 1.4rem;">
+                📊 View All-User Combined Dashboard
+            </a>
+        </div>
+
+        {% if messages %}
+        <div style="margin-bottom: 1.5rem;">
+            {% for message in messages %}
+            <div
+                style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; padding: 0.8rem 1.2rem; border-radius: var(--radius-md); font-size: 0.95rem; margin-bottom: 0.5rem;">
+                ✅ {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Stat Widgets Row -->
+        <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-bottom: 2rem;">
+
+            <div class="result-card" style="margin: 0; padding: 1.2rem; text-align: center;">
+                <span style="font-size: 2rem;">👥</span>
+                <span
+                    style="font-size: 0.85rem; color: var(--clr-text-muted); display: block; margin-top: 0.3rem;">Total
+                    Registered Users</span>
+                <strong style="font-size: 1.8rem; color: var(--clr-text);">{{ total_users }}</strong>
+            </div>
+
+            <div class="result-card" style="margin: 0; padding: 1.2rem; text-align: center;">
+                <span style="font-size: 2rem;">✅</span>
+                <span
+                    style="font-size: 0.85rem; color: var(--clr-text-muted); display: block; margin-top: 0.3rem;">Active
+                    Accounts</span>
+                <strong style="font-size: 1.8rem; color: #10b981;">{{ active_users }}</strong>
+            </div>
+
+            <div class="result-card" style="margin: 0; padding: 1.2rem; text-align: center;">
+                <span style="font-size: 2rem;">🚫</span>
+                <span
+                    style="font-size: 0.85rem; color: var(--clr-text-muted); display: block; margin-top: 0.3rem;">Suspended
+                    / Banned</span>
+                <strong style="font-size: 1.8rem; color: #ef4444;">{{ banned_users }}</strong>
+            </div>
+
+            <div class="result-card" style="margin: 0; padding: 1.2rem; text-align: center;">
+                <span style="font-size: 2rem;">🤖</span>
+                <span
+                    style="font-size: 0.85rem; color: var(--clr-text-muted); display: block; margin-top: 0.3rem;">Total
+                    AI Predictions Run</span>
+                <strong style="font-size: 1.8rem; color: var(--clr-accent);">{{ total_predictions }}</strong>
+            </div>
+
+        </div>
+
+        <div class="admin-layout">
+
+            <!-- Main Column: User Management Table -->
+            <div>
+                <!-- Search & Filters Bar -->
+                <div
+                    style="background: var(--clr-surface); border: 1px solid var(--clr-border); padding: 1.2rem; border-radius: var(--radius-md); margin-bottom: 1.2rem;">
+                    <form method="GET" action="{% url 'farming:admin_dashboard' %}"
+                        style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                        <div style="flex: 1; min-width: 220px;">
+                            <input type="text" name="q" value="{{ search_query }}" class="form-input"
+                                placeholder="🔍 Search by name, username, or email..."
+                                style="width: 100%; padding: 0.6rem 1rem;">
+                        </div>
+
+                        <div>
+                            <select name="status" class="form-input" style="padding: 0.6rem 1rem;">
+                                <option value="">All Statuses</option>
+                                <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active
+                                </option>
+                                <option value="banned" {% if status_filter == 'banned' %}selected{% endif %}>Banned
+                                </option>
+                                <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive
+                                </option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <select name="role" class="form-input" style="padding: 0.6rem 1rem;">
+                                <option value="">All Roles</option>
+                                <option value="user" {% if role_filter == 'user' %}selected{% endif %}>User</option>
+                                <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>Admin</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary"
+                            style="padding: 0.6rem 1.2rem; font-size: 0.9rem;">Filter</button>
+                        {% if search_query or status_filter or role_filter %}
+                        <a href="{% url 'farming:admin_dashboard' %}" class="btn"
+                            style="background: var(--clr-surface-2); color: var(--clr-text-muted); padding: 0.6rem 1rem; font-size: 0.85rem;">Clear</a>
+                        {% endif %}
+                    </form>
+                </div>
+
+                <!-- Users Data Table -->
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Contact Details</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th class="hide-mobile">Joined Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in users %}
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 0.8rem;">
+                                        {% if u.profile.profile_picture %}
+                                        <img src="{{ u.profile.profile_picture.url }}" alt="{{ u.username }}"
+                                            style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid var(--clr-primary);">
+                                        {% else %}
+                                        <div
+                                            style="width: 36px; height: 36px; border-radius: 50%; background: var(--clr-surface-2); border: 1px solid var(--clr-border); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--clr-primary);">
+                                            {{ u.username|slice:":1"|upper }}
+                                        </div>
+                                        {% endif %}
+                                        <div>
+                                            <strong
+                                                style="display: block; font-size: 0.95rem; color: var(--clr-text);">{{
+                                                u.get_full_name|default:u.username }}</strong>
+                                            <span style="font-size: 0.78rem; color: var(--clr-text-muted);">Username:
+                                                @{{ u.username }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="font-size: 0.85rem;">
+                                        <div>{{ u.email }}</div>
+                                        <div style="color: var(--clr-text-muted); font-size: 0.78rem;">{{
+                                            u.profile.phone_number|default:"No phone" }} • {{
+                                            u.profile.state|default:"India" }}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-{{ u.profile.role }}">{{ u.profile.role|upper }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-{{ u.profile.status }}">{{ u.profile.status|upper }}</span>
+                                </td>
+                                <td style="font-size: 0.82rem; color: var(--clr-text-muted);">
+                                    {{ u.date_joined|date:"M d, Y" }}
+                                </td>
+                                <td>
+                                    <div style="display: flex; gap: 0.4rem;">
+                                        <a href="{% url 'farming:admin_user_detail' u.id %}" class="btn"
+                                            style="padding: 0.35rem 0.65rem; font-size: 0.78rem; background: var(--clr-surface-2); border: 1px solid var(--clr-border); color: var(--clr-text);">
+                                            👁️ View
+                                        </a>
+
+                                        {% if u != request.user %}
+                                        <form method="POST" action="{% url 'farming:admin_toggle_user_status' u.id %}"
+                                            style="display: inline;">
+                                            {% csrf_token %}
+                                            {% if u.profile.status == 'active' %}
+                                            <button type="submit" class="btn"
+                                                style="padding: 0.35rem 0.65rem; font-size: 0.78rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171;"
+                                                title="Suspend User">
+                                                🚫 Ban
+                                            </button>
+                                            {% else %}
+                                            <button type="submit" class="btn"
+                                                style="padding: 0.35rem 0.65rem; font-size: 0.78rem; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;"
+                                                title="Activate User">
+                                                ✅ Unban
+                                            </button>
+                                            {% endif %}
+                                        </form>
+
+                                        <form method="POST" action="{% url 'farming:admin_toggle_user_role' u.id %}"
+                                            style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn"
+                                                style="padding: 0.35rem 0.65rem; font-size: 0.78rem; background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); color: #a78bfa;"
+                                                title="Toggle Role">
+                                                👑 Role
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                        <a href="{% url 'farming:admin_user_detail' u.id %}" class="btn"
+                                            style="padding: 0.35rem 0.65rem; font-size: 0.78rem; background: var(--clr-surface-2); border: 1px solid var(--clr-border); color: var(--clr-text);">Check
+                                            Logs</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6"
+                                    style="text-align: center; color: var(--clr-text-muted); padding: 2rem;">
+                                    No users matching query found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sidebar: System Activity Logs Audit Stream -->
+
+
+        </div>
+
+    </div>
+</section>
+{% endblock %}

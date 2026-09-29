@@ -1,0 +1,152 @@
+{% extends 'farming/base.html' %}
+
+{% block title %}Market Analysis{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="section-container">
+        <div class="page-header">
+            <h1 class="page-title">📊 <span data-i18n="res_market_title">Market Analysis</span></h1>
+            <p class="page-subtitle" data-i18n="nav_market">Analyze crop prices and predict future trends using ML</p>
+        </div>
+
+        {% if not result %}
+        <div class="form-card">
+            <form method="post" class="form-grid" id="market-form">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="form-group">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <span class="form-error">{{ field.errors.0 }}</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary btn-full" id="analyze-market-btn" data-i18n="btn_analyze_market">
+                    📈 Analyze Market <span class="btn-arrow">→</span>
+                </button>
+            </form>
+        </div>
+        {% else %}
+            {% if result.error %}
+            <div class="result-card result-error">
+                <div class="result-icon">⚠️</div>
+                <h2 class="result-title">Error</h2>
+                <p class="result-text">{{ result.error }}</p>
+                <div style="margin-top:2rem;">
+                    <a href="{% url 'farming:market_analysis' %}" class="btn btn-outline" data-i18n="btn_try_again">Try Again</a>
+                </div>
+            </div>
+            {% else %}
+            <div class="result-card result-success" id="report-container" style="max-width:800px;">
+                <div class="result-icon">📊</div>
+                <h2 class="result-title" data-i18n="res_market_title">Market Analysis</h2>
+                <p class="result-text" style="margin-bottom:0.5rem;">Region: <strong>{{ result.state }}</strong></p>
+                <p class="result-text" style="margin-bottom:1.5rem;">Current Price: <strong style="color:var(--clr-primary);">₹{{ result.current_price }}/kg</strong></p>
+
+                <!-- Price Chart -->
+                <div style="background:var(--clr-surface-2); border-radius:var(--radius-md); padding:1.5rem; margin-bottom:2rem;">
+                    <canvas id="priceChart" style="width:100%; max-height:350px;"></canvas>
+                </div>
+
+                <!-- Trend indicator -->
+                <div class="result-details" style="margin-bottom:1.5rem;">
+                    <div class="detail-chip">
+                        <span class="chip-label">3-Month Trend</span>
+                        <span class="chip-value" style="color:{% if result.trend == 'up' %}#22c55e{% else %}#ef4444{% endif %};">
+                            {% if result.trend == 'up' %}📈 Upward{% else %}📉 Downward{% endif %}
+                        </span>
+                    </div>
+                    {% for item in result.future_data %}
+                    <div class="detail-chip">
+                        <span class="chip-label">{{ item.label }}</span>
+                        <span class="chip-value">₹{{ item.price }}/kg</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="result-section">
+                    <h3>📋 Past 3 Months (Live / Estimated Data)</h3>
+                    <div class="ideal-grid" style="margin-top:0.8rem;">
+                        {% for item in result.past_data %}
+                        <div class="ideal-item">
+                            <span class="ideal-label">{{ item.label }}</span>
+                            <span class="ideal-value">₹{{ item.price }}/kg</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div style="margin-top:2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="{% url 'farming:export_pdf_report' 'market' %}" class="btn btn-primary" target="_blank">
+                        📄 Download PDF Report
+                    </a>
+                    <a href="{% url 'farming:market_analysis' %}" class="btn btn-outline">Analyze Another Crop</a>
+                </div>
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+{% if result and not result.error %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    const labels = {{ result.labels_json|safe }};
+    const prices = {{ result.prices_json|safe }};
+
+    // Split into historical vs predicted
+    const splitIdx = labels.length - 3; // last 3 are predictions
+
+    const ctx = document.getElementById('priceChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Historical / Current Price (₹/kg)',
+                    data: prices.map((v, i) => i < splitIdx ? v : null),
+                    borderColor: '#22c55e',
+                    backgroundColor: 'rgba(34,197,94,0.15)',
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#22c55e',
+                    tension: 0.3,
+                    fill: true,
+                },
+                {
+                    label: 'ML Predicted Price (₹/kg)',
+                    data: prices.map((v, i) => i >= splitIdx - 1 ? v : null),
+                    borderColor: '#06b6d4',
+                    backgroundColor: 'rgba(6,182,212,0.12)',
+                    borderWidth: 3,
+                    borderDash: [8, 4],
+                    pointRadius: 5,
+                    pointBackgroundColor: '#06b6d4',
+                    tension: 0.3,
+                    fill: true,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#e2e8f0', font: { family: 'Inter' } } },
+                tooltip: { mode: 'index', intersect: false },
+            },
+            scales: {
+                x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                y: {
+                    ticks: { color: '#94a3b8', callback: v => '₹' + v },
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                }
+            }
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}

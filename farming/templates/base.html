@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Farming Solution{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes glow {
+            0% { text-shadow: 0 0 10px #34d399, 0 0 20px #34d399, 0 0 30px #34d399; }
+            50% { text-shadow: 0 0 20px #10b981, 0 0 30px #10b981, 0 0 40px #10b981; }
+            100% { text-shadow: 0 0 10px #34d399, 0 0 20px #34d399, 0 0 30px #34d399; }
+        }
+        .glowing-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            animation: glow 2s infinite alternate;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-green-400 to-green-600 min-h-screen flex flex-col justify-between">
+
+    <header class="w-full py-6 flex justify-center bg-green-800">
+        <h1 class="glowing-text">Smart Farming Solution</h1>
+    </header>
+
+    <main class="flex items-center justify-center flex-grow relative">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="w-full bg-gray-900 text-white text-center py-3">
+        <p class="text-lg">Developed by Our Team</p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

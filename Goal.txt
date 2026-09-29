@@ -1,0 +1,10 @@
+Everything is working great, 
+
+Yet to add------
+
+1.login page for both user and admin + DB ---- DONE
+2.AI chatbot ---- DONE
+3.mobile application
+4.if the owner of the field is eligible for the crop loss benifits or not ---- DONE
+5.PDF export of the report of the testing of all ---- DONE
+6.Multilang support ---- DONE

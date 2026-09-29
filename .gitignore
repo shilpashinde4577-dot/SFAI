@@ -1,0 +1,52 @@
+﻿# -------------------------------------------------
+# General OS / IDE artefacts
+# -------------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+env/
+venv/
+*.egg-info/
+*.egg
+
+# -------------------------------------------------
+# Python / Django specifics
+# -------------------------------------------------
+*.log
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+*.pyc
+
+# -------------------------------------------------
+# Data & model artefacts you probably don’t want public
+# -------------------------------------------------
+data/
+models/
+*.h5
+*.pt
+*.ckpt
+
+# -------------------------------------------------
+# Large media you explicitly want to exclude
+# -------------------------------------------------
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+*.wav
+*.mp3
+
+# -------------------------------------------------
+# Implementation‑plan /### Where to put the **.gitignore**
+
+Create the file **in the root of the project folder** – the same directory where you will run git init.  
+For your project that directory is:
+
