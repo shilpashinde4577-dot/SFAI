@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">SmartFarm AI</string>
+    <string name="hero_tagline">Intelligent Agricultural Decision Platform</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_tools">Tools</string>
+    <string name="nav_report">Report</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_admin">Admin</string>
+    <string name="crop_recommendation">Crop Recommendation</string>
+    <string name="disease_detection">Disease Detection</string>
+    <string name="fertilizer_guide">Fertilizer Guide</string>
+    <string name="weather_prediction">Weather Prediction</string>
+    <string name="market_analysis">Market Analysis</string>
+    <string name="crop_compensation">Crop Compensation</string>
+    <string name="benefit_eligibility">Govt Crop Loss Benefits</string>
+</resources>

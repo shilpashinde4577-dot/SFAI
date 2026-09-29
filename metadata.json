@@ -1,0 +1,8 @@
+{
+  "name": "SmartFarm AI",
+  "description": "Smart Farming assistant with crop recommendation, disease detection, fertilizer calculation, weather forecasting, market analysis, and crop compensation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
